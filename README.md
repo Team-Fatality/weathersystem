@@ -32,5 +32,5 @@ NUI based fully configurable and performance-friendly dynamic weather and time s
 ## 📚 Documentation
 
 Check out the full documentation here:  
-👉 **[FT Scripts - Weather System](https://ftscripts.gitbook.io/ft-scripts/resources/overview/weather-system)**
+👉 **[FT Scripts - Weather System](https://ftscripts.gitbook.io/ft-scripts/recources/overview/weather-system)**
 
