@@ -1,6 +1,6 @@
 # 🌦️ FiveM Weather System
 
-A fully configurable and performance-friendly dynamic weather and time synchronization system for FiveM. Built to work with **ESX** and **QBCore**, and designed for immersive RP environments.
+NUI based fully configurable and performance-friendly dynamic weather and time synchronization system for FiveM. Built to work with **ESX** and **QBCore**, and designed for immersive RP environments.
 
 ---
 ## 📸 ShowCase
