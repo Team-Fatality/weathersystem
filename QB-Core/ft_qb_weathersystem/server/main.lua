@@ -1,4 +1,4 @@
-local ESX = exports['es_extended']:getSharedObject()
+local QBCore = exports['qb-core']:GetCoreObject()
 
 local DynamicTime = Config.DynamicTime
 local TimeSpeed = Config.TimeCycleSpeed
@@ -32,7 +32,7 @@ function SetWeather(weatherType)
     end
 
     CurrentWeather = weatherType
-    TriggerClientEvent('ft_weather:setWeather', -1, weatherType)
+    TriggerClientEvent('ft_qb_weather:setWeather', -1, weatherType)
     return true
 end
 
@@ -76,7 +76,7 @@ function SetTime(hour, minute, isManualChange)
         lastManualTimeChange = GetGameTimer()
     end
     
-    TriggerClientEvent('ft_weather:setTime', -1, hour, minute)
+    TriggerClientEvent('ft_qb_weather:setTime', -1, hour, minute)
     return true
 end
 
@@ -112,94 +112,94 @@ CreateThread(function()
 
                 if newHour ~= CurrentTime.hour or newMinute ~= CurrentTime.minute then
                     CurrentTime = { hour = newHour, minute = newMinute }
-                    TriggerClientEvent('ft_weather:setTime', -1, newHour, newMinute)
+                    TriggerClientEvent('ft_qb_weather:setTime', -1, newHour, newMinute)
                 end
             end
         end
     end
 end)
 
-RegisterNetEvent('ft_weather:setweather', function(weatherType)
+RegisterNetEvent('ft_qb_weather:setweather', function(weatherType)
     local src = source
-    local xPlayer = ESX.GetPlayerFromId(src)
+    local Player = QBCore.Functions.GetPlayer(src)
 
-    if xPlayer then
+    if Player then
         local success = SetWeather(weatherType)
         if success then
-            xPlayer.showNotification('Weather changed to: ' .. weatherType)
+            TriggerClientEvent('QBCore:Notify', src, 'Weather changed to: ' .. weatherType, 'success')
         else
-            xPlayer.showNotification('Invalid weather type.')
+            TriggerClientEvent('QBCore:Notify', src, 'Invalid weather type.', 'error')
         end
     end
 end)
 
-RegisterNetEvent('ft_weather:settime', function(hour, minute)
+RegisterNetEvent('ft_qb_weather:settime', function(hour, minute)
     local src = source
-    local xPlayer = ESX.GetPlayerFromId(src)
+    local Player = QBCore.Functions.GetPlayer(src)
 
-    if xPlayer then
+    if Player then
         SetTime(hour, minute, true)
-        xPlayer.showNotification(('Time changed to: %02d:%02d'):format(hour, minute))
+        TriggerClientEvent('QBCore:Notify', src, ('Time changed to: %02d:%02d'):format(hour, minute), 'success')
     end
 end)
 
-RegisterNetEvent('ft_weather:toggledynamictime', function()
+RegisterNetEvent('ft_qb_weather:toggledynamictime', function()
     local src = source
-    local xPlayer = ESX.GetPlayerFromId(src)
+    local Player = QBCore.Functions.GetPlayer(src)
 
-    if xPlayer then
+    if Player then
         DynamicTime = not DynamicTime
         local stateText = DynamicTime and 'unfrozen' or 'frozen'
-        xPlayer.showNotification('Time is now ' .. stateText)
+        TriggerClientEvent('QBCore:Notify', src, 'Time is now ' .. stateText, 'success')
     end
 end)
 
-RegisterNetEvent('ft_weather:toggledynamicweather', function()
+RegisterNetEvent('ft_qb_weather:toggledynamicweather', function()
     local src = source
-    local xPlayer = ESX.GetPlayerFromId(src)
+    local Player = QBCore.Functions.GetPlayer(src)
 
-    if xPlayer then
+    if Player then
         DynamicWeather = not DynamicWeather
-        xPlayer.showNotification('Dynamic weather: '..(DynamicWeather and 'ENABLED' or 'DISABLED'))
+        TriggerClientEvent('QBCore:Notify', src, 'Dynamic weather: ' .. (DynamicWeather and 'ENABLED' or 'DISABLED'), 'success')
     end
 end)
 
-RegisterNetEvent('ft_weather:setweatherinterval', function(minutes)
+RegisterNetEvent('ft_qb_weather:setweatherinterval', function(minutes)
     local src = source
-    local xPlayer = ESX.GetPlayerFromId(src)
+    local Player = QBCore.Functions.GetPlayer(src)
 
-    if xPlayer then
+    if Player then
         if minutes and minutes > 0 then
             WeatherChangeTime = minutes
-            xPlayer.showNotification(('Weather change interval set to: %d minutes'):format(minutes))
+            TriggerClientEvent('QBCore:Notify', src, ('Weather change interval set to: %d minutes'):format(minutes), 'success')
         end
     end
 end)
 
-RegisterNetEvent('ft_weather:settimeinterval', function(speed)
+RegisterNetEvent('ft_qb_weather:settimeinterval', function(speed)
     local src = source
-    local xPlayer = ESX.GetPlayerFromId(src)
+    local Player = QBCore.Functions.GetPlayer(src)
     time = 1440 / (tonumber(speed) * 60)
 
-    if xPlayer then
+    if Player then
         if speed and speed > 0 then
             timeStep = time
-            xPlayer.showNotification(('Time speed set to: %.2f'):format(speed))
+            TriggerClientEvent('QBCore:Notify', src, ('Time speed set to: %.2f'):format(speed), 'success')
         end
     end
 end)
 
 AddEventHandler('playerJoining', function()
     local playerId = source
-    TriggerClientEvent('ft_weather:setWeather', playerId, CurrentWeather)
-    TriggerClientEvent('ft_weather:setTime', playerId, CurrentTime.hour, CurrentTime.minute)
+    TriggerClientEvent('ft_qb_weather:setWeather', playerId, CurrentWeather)
+    TriggerClientEvent('ft_qb_weather:setTime', playerId, CurrentTime.hour, CurrentTime.minute)
 end)
 
-RegisterServerEvent('ft_weather:requestSync')
-AddEventHandler('ft_weather:requestSync', function()
+RegisterServerEvent('ft_qb_weather:requestSync')
+AddEventHandler('ft_qb_weather:requestSync', function()
     local playerId = source
-    TriggerClientEvent('ft_weather:setWeather', playerId, CurrentWeather)
-    TriggerClientEvent('ft_weather:setTime', playerId, CurrentTime.hour, CurrentTime.minute)
+    TriggerClientEvent('ft_qb_weather:setWeather', playerId, CurrentWeather)
+    TriggerClientEvent('ft_qb_weather:setTime', playerId, CurrentTime.hour, CurrentTime.minute)
 end)
 
 AddEventHandler('onResourceStart', function(resourceName)
@@ -212,76 +212,72 @@ AddEventHandler('onResourceStart', function(resourceName)
 
 end)
 
-ESX.RegisterCommand('setweather', 'admin', function(xPlayer, args, showError)
-    local weather = args.weather and string.upper(args.weather) or nil
-    if weather then
+QBCore.Commands.Add('setweather', 'Change server weather', {{name='weather', help='Weather type'}}, true, function(source, args)
+    local Player = QBCore.Functions.GetPlayer(source)
+    if Player and Player.PlayerData.job.name == 'admin' then
+        local weather = args[1] and string.upper(args[1])
         if SetWeather(weather) then
-            xPlayer.showNotification('Weather changed to: '..weather)
+            TriggerClientEvent('QBCore:Notify', source, 'Weather changed to: ' .. weather, 'success')
         else
-            xPlayer.showNotification('Invalid weather type!')
+            TriggerClientEvent('QBCore:Notify', source, 'Invalid weather type.', 'error')
         end
-    else
-        xPlayer.showNotification('Usage: /setweather [weathertype]')
     end
-end, true, {help = 'Change server weather', validate = true, arguments = {
-    {name = 'weather', help = 'Weather type to set', type = 'string'}
-}})
+end, 'admin')
 
-ESX.RegisterCommand('settime', 'admin', function(xPlayer, args, showError)
-    local hour = tonumber(args.hour)
-    local minute = tonumber(args.minute) or 0
-    
-    if hour then
-        if SetTime(hour, minute, true) then 
-            xPlayer.showNotification(('Time changed to: %02d:%02d'):format(hour, minute))
+QBCore.Commands.Add('settime', 'Change server time', {
+    {name='hour', help='Hour (0-23)'},
+    {name='minute', help='Minute (0-59)'}
+}, true, function(source, args)
+    local Player = QBCore.Functions.GetPlayer(source)
+    if Player and Player.PlayerData.job.name == 'admin' then
+        local hour = tonumber(args[1])
+        local minute = tonumber(args[2]) or 0
+        if hour then
+            SetTime(hour, minute, true)
+            TriggerClientEvent('QBCore:Notify', source, ('Time changed to: %02d:%02d'):format(hour, minute), 'success')
         end
-    else
-        xPlayer.showNotification('Usage: /settime [hour] [minute]')
     end
-end, true, {help = 'Change server time', validate = true, arguments = {
-    {name = 'hour', help = 'Hour (0-23)', type = 'number'},
-    {name = 'minute', help = 'Minute (0-59)', type = 'number', optional = true}
-}})
+end, 'admin')
 
-ESX.RegisterCommand('toggledynamicweather', 'admin', function(xPlayer, args, showError)
-    DynamicWeather = not DynamicWeather
-    xPlayer.showNotification('Dynamic weather: '..(DynamicWeather and 'ENABLED' or 'DISABLED'))
-end, true, {help = 'Toggle automatic weather changes'})
+QBCore.Commands.Add('toggledynamicweather', 'Toggle dynamic weather', {}, false, function(source)
+    local Player = QBCore.Functions.GetPlayer(source)
+    if Player and Player.PlayerData.job.name == 'admin' then
+        DynamicWeather = not DynamicWeather
+        TriggerClientEvent('QBCore:Notify', source, 'Dynamic weather: ' .. (DynamicWeather and 'ENABLED' or 'DISABLED'), 'success')
+    end
+end, 'admin')
 
-ESX.RegisterCommand('toggledynamictime', 'admin', function(xPlayer, args, showError)
-    DynamicTime = not DynamicTime
-    xPlayer.showNotification('Dynamic time: '..(DynamicTime and 'ENABLED' or 'DISABLED'))
-end, true, {help = 'Toggle automatic time progression'})
+QBCore.Commands.Add('toggledynamictime', 'Toggle dynamic time', {}, false, function(source)
+    local Player = QBCore.Functions.GetPlayer(source)
+    if Player and Player.PlayerData.job.name == 'admin' then
+        DynamicTime = not DynamicTime
+        TriggerClientEvent('QBCore:Notify', source, 'Dynamic time: ' .. (DynamicTime and 'ENABLED' or 'DISABLED'), 'success')
+    end
+end, 'admin')
 
-ESX.RegisterCommand('setweatherinterval', 'admin', function(xPlayer, args, showError)
-    local minutes = tonumber(args.minutes)
-    if minutes and minutes > 0 then
+QBCore.Commands.Add('setweatherinterval', 'Set weather change interval', {{name='minutes', help='Minutes'}}, true, function(source, args)
+    local Player = QBCore.Functions.GetPlayer(source)
+    local minutes = tonumber(args[1])
+    if Player and Player.PlayerData.job.name == 'admin' and minutes then
         WeatherChangeTime = minutes
-        xPlayer.showNotification(('Weather change interval set to: %d minutes'):format(minutes))
-    else
-        xPlayer.showNotification('Usage: /setweatherinterval [minutes]')
+        TriggerClientEvent('QBCore:Notify', source, ('Weather change interval set to: %d minutes'):format(minutes), 'success')
     end
-end, true, {help = 'Set minutes between weather changes', validate = true, arguments = {
-    {name = 'minutes', help = 'Minutes between weather changes', type = 'number'}
-}})
+end, 'admin')
 
-ESX.RegisterCommand('settimespeed', 'admin', function(xPlayer, args, showError)
-    local speed = tonumber(args.speed)
-    if speed and speed > 0 then
-        TimeSpeed = speed
-        xPlayer.showNotification(('Time speed set to: %.2f'):format(speed))
-    else
-        xPlayer.showNotification('Usage: /settimespeed [speed] (e.g., 0.5 for half realtime)')
+QBCore.Commands.Add('settimespeed', 'Set time speed multiplier', {{name='speed', help='Speed value'}}, true, function(source, args)
+    local Player = QBCore.Functions.GetPlayer(source)
+    local speed = tonumber(args[1])
+    if Player and Player.PlayerData.job.name == 'admin' and speed then
+        timeStep = 1440 / (speed * 60)
+        TriggerClientEvent('QBCore:Notify', source, ('Time speed set to: %.2f'):format(speed), 'success')
     end
-end, true, {help = 'Set time progression speed', validate = true, arguments = {
-    {name = 'speed', help = 'Time speed multiplier', type = 'number'}
-}})
+end, 'admin')
 
-ESX.RegisterCommand('freezetime', 'admin', function(xPlayer, args, showError)
-    DynamicTime = not DynamicTime
-    local stateText = DynamicTime and 'unfrozen' or 'frozen'
-    xPlayer.showNotification('Time is now ' .. stateText)
-end, true, {
-    help = 'Toggle time freeze/unfreeze',
-    validate = true
-})
+QBCore.Commands.Add('freezetime', 'Toggle time freeze/unfreeze', {}, false, function(source)
+    local Player = QBCore.Functions.GetPlayer(source)
+    if Player and Player.PlayerData.job.name == 'admin' then
+        DynamicTime = not DynamicTime
+        local stateText = DynamicTime and 'unfrozen' or 'frozen'
+        TriggerClientEvent('QBCore:Notify', source, 'Time is now ' .. stateText, 'success')
+    end
+end, 'admin')
