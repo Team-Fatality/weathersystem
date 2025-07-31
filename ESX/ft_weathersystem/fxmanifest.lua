@@ -1,7 +1,7 @@
 fx_version 'cerulean'
 game 'gta5'
 
-name "ft_starterpack"
+name "ft_weathersystem"
 author "PAPU (!PAPU.・ᶠᵀ#6969)"
 version "1.0"
 
@@ -11,12 +11,10 @@ shared_scripts {
 }
 
 client_scripts {
-    'locales/*',
     'client/*'
 }
 
 server_scripts {
-    'locales/*',
     'server/*'
 }
 
@@ -28,16 +26,4 @@ files {
     'dist/images/*' 
 }
 
-escrow_ignore {
-    'locales/*',
-    'shared/*',
-    'client/edit.lua',
-    'server/edit.lua',
-    'INSTALL-FIRST/*'
-}
-
 lua54 'yes'
-
-dependencies {
-    'ox_lib',
-}
