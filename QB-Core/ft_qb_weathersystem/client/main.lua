@@ -3,8 +3,8 @@ local currentTime = nil
 local lastWeatherSync = 0
 local lastTimeSync = 0
 
-RegisterNetEvent('ft_weather:setWeather')
-AddEventHandler('ft_weather:setWeather', function(weatherType)
+RegisterNetEvent('ft_qb_weather:setWeather')
+AddEventHandler('ft_qb_weather:setWeather', function(weatherType)
     if currentWeather == weatherType then return end
     
     ClearWeatherTypePersist()
@@ -26,8 +26,8 @@ AddEventHandler('ft_weather:setWeather', function(weatherType)
     end)
 end)
 
-RegisterNetEvent('ft_weather:setTime')
-AddEventHandler('ft_weather:setTime', function(hour, minute)
+RegisterNetEvent('ft_qb_weather:setTime')
+AddEventHandler('ft_qb_weather:setTime', function(hour, minute)
     NetworkOverrideClockTime(hour, minute, 0)
     currentTime = {hour = hour, minute = minute}
     lastTimeSync = GetGameTimer()
@@ -38,7 +38,7 @@ Citizen.CreateThread(function()
         Citizen.Wait(100)
     end
     
-    TriggerServerEvent('ft_weather:requestSync')
+    TriggerServerEvent('ft_qb_weather:requestSync')
     
     while true do
         Citizen.Wait(30000) 
@@ -58,15 +58,15 @@ Citizen.CreateThread(function()
 end)
 
 function ChangeWeather(weatherType)
-    TriggerServerEvent('ft_weather:setweather', weatherType)
+    TriggerServerEvent('ft_qb_weather:setweather', weatherType)
 end
 
 function ChangeTime(hour, minute)
-    TriggerServerEvent('ft_weather:settime', hour, minute)
+    TriggerServerEvent('ft_qb_weather:settime', hour, minute)
 end
 
 function ToggleFreezeTime()
-    TriggerServerEvent('ft_weather:toggledynamictime')
+    TriggerServerEvent('ft_qb_weather:toggledynamictime')
 end
 
 exports('ChangeWeather', ChangeWeather)
@@ -113,41 +113,41 @@ end)
 
 RegisterNUICallback("setWeather", function(data, cb)
     local weatherType = data.mode
-    TriggerServerEvent('ft_weather:setweather', weatherType)
+    TriggerServerEvent('ft_qb_weather:setweather', weatherType)
     cb({ status = "ok" })
 end)
 
 RegisterNUICallback("setTime", function(data, cb)
     local hour = data.hour
     local minute = data.minute
-    TriggerServerEvent('ft_weather:settime', hour, minute)
+    TriggerServerEvent('ft_qb_weather:settime', hour, minute)
     cb({ status = "ok" })
 end)
 
 RegisterNUICallback("freezeTime", function(data, cb)
-    TriggerServerEvent('ft_weather:toggledynamictime')
+    TriggerServerEvent('ft_qb_weather:toggledynamictime')
     cb({ status = "ok" })
 end)
 
 RegisterNUICallback("dynamicweather", function(data, cb)
-    TriggerServerEvent('ft_weather:toggledynamicweather')
+    TriggerServerEvent('ft_qb_weather:toggledynamicweather')
     cb({ status = "ok" })
 end)
 
 RegisterNUICallback("dynamictime", function(data, cb)
-    TriggerServerEvent('ft_weather:toggledynamictime')
+    TriggerServerEvent('ft_qb_weather:toggledynamictime')
     cb({ status = "ok" })
 end)
 
 RegisterNUICallback("setWeatherInterval", function(data, cb)
     local interval = data.interval
-    TriggerServerEvent('ft_weather:setweatherinterval', interval)
+    TriggerServerEvent('ft_qb_weather:setweatherinterval', interval)
     cb({ status = "ok" })
 end)
 
 RegisterNUICallback("setTimeSpeed", function(data, cb)
     local speed = data.speed
-    TriggerServerEvent('ft_weather:settimeinterval', speed)
+    TriggerServerEvent('ft_qb_weather:settimeinterval', speed)
     cb({ status = "ok" })
 end)
 
