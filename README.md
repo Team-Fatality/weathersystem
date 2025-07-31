@@ -28,12 +28,8 @@ NUI based fully configurable and performance-friendly dynamic weather and time s
 | `/setweatherinterval [min]`  | Change weather interval            |
 | `/toggledynamicweather`      | Enable/disable weather cycling     |
 
----
+## 📚 Documentation
 
-## 📦 Exports (Client-side)
-
-```lua
-exports['ft_weathersync']:ChangeWeather("RAIN")
-exports['ft_weathersync']:ChangeTime(18, 30)
-exports['ft_weathersync']:ToggleFreezeTime()
+Check out the full documentation here:  
+👉 **[FT Scripts - Weather System](https://ftscripts.gitbook.io/ft-scripts/resources/overview/weather-system)**
 
