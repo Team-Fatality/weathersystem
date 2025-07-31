@@ -1,7 +1,7 @@
 fx_version 'cerulean'
 game 'gta5'
 
-name "ft_weathersystem"
+name "ft_qb_weathersystem"
 author "PAPU (!PAPU.・ᶠᵀ#6969)"
 version "1.0"
 
